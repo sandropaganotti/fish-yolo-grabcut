@@ -2,4 +2,4 @@ build:
   docker:
     web: heroku.Dockerfile
 run:
-  web: bundle exec ./heroku_startup.sh
+  web: /bin/bash ./heroku_startup.sh
