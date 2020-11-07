@@ -21,7 +21,8 @@ enableCORS = false\n\
 RUN apt-get update && \
     apt-get install -y \
     python3.7 python3-pip \
-    libsm6 libxext6 libxrender-dev
+    libsm6 libxext6 libxrender-dev \
+    ffmpeg
 
 # expose port 8501 for streamlit
 EXPOSE 8501
@@ -31,6 +32,9 @@ WORKDIR /streamlit-docker
 
 # copy requirements.txt
 COPY requirements.txt ./requirements.txt
+
+# upgrade pip
+RUN pip3 install --upgrade pip
 
 # install dependencies
 RUN pip3 install -r requirements.txt
