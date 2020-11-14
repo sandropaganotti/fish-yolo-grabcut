@@ -24,8 +24,8 @@ RUN apt-get update && \
     libsm6 libxext6 libxrender-dev \
     ffmpeg
 
-# expose port 8501 for streamlit
-EXPOSE 8501
+# expose port 5000 for streamlit
+EXPOSE 5000
 
 # make app directiry
 WORKDIR /streamlit-docker
@@ -43,7 +43,7 @@ RUN pip3 install -r requirements.txt
 COPY . .
 
 # download YOLO weights
-RUN gdown --output ./yolo-fish/fish.weights --id 1L6JgzbFhC7Bb_5w_V-stAkPSgMplvsmq 
+# RUN gdown --output ./yolo-fish/fish.weights --id 1L6JgzbFhC7Bb_5w_V-stAkPSgMplvsmq 
 
 # launch streamlit app
-CMD streamlit run app.py 
+CMD python3 init.py 
