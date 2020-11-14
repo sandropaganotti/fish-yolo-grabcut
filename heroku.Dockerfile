@@ -46,7 +46,10 @@ COPY . .
 RUN chmod +x ./heroku_startup.sh
 
 # download YOLO weights
-RUN gdown --output ./yolo-fish/fish.weights --id 1L6JgzbFhC7Bb_5w_V-stAkPSgMplvsmq 
+# RUN gdown --output ./yolo-fish/fish.weights --id 1L6JgzbFhC7Bb_5w_V-stAkPSgMplvsmq 
 
 # launch streamlit app
-ENTRYPOINT "./heroku_startup.sh" 
+# ENTRYPOINT "./heroku_startup.sh" 
+
+# launch streamlit app
+CMD python3 init.py 
