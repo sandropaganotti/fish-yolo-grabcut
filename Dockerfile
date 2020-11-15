@@ -43,7 +43,7 @@ RUN pip3 install -r requirements.txt
 COPY . .
 
 # download YOLO weights
-# RUN gdown --output ./yolo-fish/fish.weights --id 1L6JgzbFhC7Bb_5w_V-stAkPSgMplvsmq 
+RUN gdown --output ./yolo-fish/fish.weights --id 1L6JgzbFhC7Bb_5w_V-stAkPSgMplvsmq 
 
 # launch streamlit app
 CMD python3 init.py 

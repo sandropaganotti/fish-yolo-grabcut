@@ -1,0 +1,25 @@
+<style>
+    .frame{
+        position: relative;
+    }
+    .frame div {
+        position: absolute;
+        top: attr(data-top px, 0);
+    }
+
+</style>
+
+<div class="frame">
+    <img src="/static/DSC_0061.JPG">
+    {% if has_boxes %}
+        {% for i in idxs %}
+            <div style=" 
+                left:{{ boxes[i][0] }}px;
+                top:{{ boxes[i][1] }}px;
+                width:{{ boxes[i][2] }}px;
+                height:{{ boxes[i][3] }}px;
+            "></div>
+        {% endfor %}
+    {% endif %}
+</div>
+
