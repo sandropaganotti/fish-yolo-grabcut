@@ -17,7 +17,7 @@ EXPOSE 8501
 WORKDIR /web
 
 # copy requirements.txt
-COPY ../requirements.txt ./requirements.txt
+COPY requirements.txt ./requirements.txt
 
 # upgrade pip
 RUN pip3 install --upgrade pip
