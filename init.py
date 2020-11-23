@@ -1,5 +1,5 @@
 from flask import Flask, render_template
-from utils import yolo, GrabCut
+from utils import yolo
 import cv2 as cv
 import os
 
@@ -11,16 +11,23 @@ def sample():
     confidence = 0.25
     threshold = 0.45
 
-    image = cv.imread("./static/DSC_0061.JPG")
-    boxes, idxs = yolo.runYOLOBoundingBoxes_streamlit(image, yolopath, confidence, threshold)
-    #result_images = GrabCut.runGrabCut(image, boxes, idxs)
+    image_name = 'DSC09441.jpg'
+    image = cv.imread("./static/" + image_name)
+    boxes, idxs, labels = yolo.runYOLOBoundingBoxes(
+        image, 
+        yolopath, 
+        confidence, 
+        threshold
+    )
 
     return render_template('sample.html', 
         boxes = boxes, 
         has_boxes = len(idxs) > 0,
-        idxs = idxs.flatten()
+        idxs = idxs.flatten() if len(idxs) > 0 else [],
+        image_name = image_name,       
+        labels = labels
     )
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(debug=True, host='0.0.0.0', port=port)

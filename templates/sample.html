@@ -4,13 +4,15 @@
     }
     .frame div {
         position: absolute;
-        top: attr(data-top px, 0);
+        border: 1px solid green;
     }
 
 </style>
 
+
+{{labels}}
 <div class="frame">
-    <img src="/static/DSC_0061.JPG">
+    <img src="/static/{{image_name}}">
     {% if has_boxes %}
         {% for i in idxs %}
             <div style=" 
