@@ -28,9 +28,6 @@ RUN pip3 install -r requirements.txt
 # copy all files over
 COPY . .
 
-# set heroku_startup.sh to be executable
-RUN chmod +x ./heroku_startup.sh
-
 # download YOLO weights
 RUN wget https://pjreddie.com/media/files/yolov3-tiny.weights -P ./yolo-fish/yolov3-tiny.weights
 
