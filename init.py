@@ -1,11 +1,16 @@
 from flask import Flask, render_template
-from utils import yolo
 from rq import Queue
+from utils import yolo
 from worker import conn
 import cv2 as cv
 import os
+import rq_dashboard
 
 app = Flask(__name__)
+app.config.from_object(rq_dashboard.default_settings)
+app.config["RQ_DASHBOARD_REDIS_URL"] = os.getenv('REDISTOGO_URL', 'redis://redis:6379')
+app.register_blueprint(rq_dashboard.blueprint, url_prefix="/rq")
+
 q = Queue(connection=conn)
 
 @app.route('/')
