@@ -3,4 +3,7 @@ build:
     web: web.Dockerfile
 run:
   web: python3 init.py
-  worker: python3 worker.py
+  worker:
+    command:
+      - python3 worker.py
+    image: web
