@@ -8,7 +8,7 @@ RUN apt-get update && \
     apt-get install -y \
     python3.7 python3-pip \
     libsm6 libxext6 libxrender-dev \
-    ffmpeg
+    ffmpeg wget
 
 # expose port 8501 for streamlit
 EXPOSE 8501
