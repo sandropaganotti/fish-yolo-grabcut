@@ -29,8 +29,5 @@ RUN pip3 install -r requirements.txt
 # copy all files over
 COPY . .
 
-# download YOLO weights
-RUN wget https://pjreddie.com/media/files/yolov3-tiny.weights -P ./yolo-fish/yolov3-tiny.weights
-
 # launch streamlit app
 CMD python3 init.py 
