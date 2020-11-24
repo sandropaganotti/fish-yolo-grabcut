@@ -11,7 +11,7 @@ def sample():
     confidence = 0.25
     threshold = 0.45
 
-    image_name = 'DSC09441.jpg'
+    image_name = 'sample.jpg'
     image_path = os.path.sep.join(["./static", image_name])
     image = cv.imread(image_path)
     boxes, idxs, labels = yolo.runYOLOBoundingBoxes(
