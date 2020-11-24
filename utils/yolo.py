@@ -5,6 +5,11 @@ import argparse
 import time
 import cv2 as cv
 import os
+import requests
+
+def count_words_at_url(url):
+    resp = requests.get(url)
+    return len(resp.text.split())
 
 def runYOLOBoundingBoxes(image, yolopath, _confidence, _threshold):
     # load all paths

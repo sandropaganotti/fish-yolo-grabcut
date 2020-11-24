@@ -1,9 +1,12 @@
 from flask import Flask, render_template
 from utils import yolo
+from rq import Queue
+from worker import conn
 import cv2 as cv
 import os
 
 app = Flask(__name__)
+q = Queue(connection=conn)
 
 @app.route('/')
 def sample():
@@ -21,12 +24,15 @@ def sample():
         threshold
     )
 
+    result = q.enqueue(yolo.count_words_at_url, 'http://heroku.com')
+
     return render_template('sample.html', 
         boxes = boxes, 
         has_boxes = len(idxs) > 0,
         idxs = idxs.flatten() if len(idxs) > 0 else [],
         image_name = image_name,       
-        labels = labels
+        labels = labels,
+        result = result
     )
 
 if __name__ == '__main__':

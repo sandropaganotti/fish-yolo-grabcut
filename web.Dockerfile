@@ -29,5 +29,5 @@ RUN pip3 install -r requirements.txt
 # copy all files over
 COPY . .
 
-# launch streamlit app
+# launch the web app
 CMD python3 init.py 

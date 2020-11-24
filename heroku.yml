@@ -1,5 +1,6 @@
 build:
   docker:
-    web: heroku.Dockerfile
+    web: web.Dockerfile
 run:
-  web: python3 init.py 
+  web: python3 init.py
+  worker: python3 worker.py
