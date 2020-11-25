@@ -1,3 +1,4 @@
+from config import params
 from flask import Flask, render_template
 from rq import Queue
 from utils import yolo
@@ -8,25 +9,21 @@ import rq_dashboard
 
 app = Flask(__name__)
 app.config.from_object(rq_dashboard.default_settings)
-app.config["RQ_DASHBOARD_REDIS_URL"] = os.getenv('REDISTOGO_URL', 'redis://redis:6379')
+app.config["RQ_DASHBOARD_REDIS_URL"] = params.REDIS_URL
 app.register_blueprint(rq_dashboard.blueprint, url_prefix="/rq")
 
 q = Queue(connection=conn)
 
 @app.route('/')
 def sample():
-    yolopath = "./yolo-fish"
-    confidence = 0.25
-    threshold = 0.45
-
-    image_name = 'sample.jpg'
-    image_path = os.path.sep.join(["./static", image_name])
-    image = cv.imread(image_path)
+    image = cv.imread(params.SAMPLE_IMAGE_PATH)
     boxes, idxs, labels = yolo.runYOLOBoundingBoxes(
         image, 
-        yolopath, 
-        confidence, 
-        threshold
+        params.COCO_NAMES_PATH,
+        params.YOLO_WEIGHTS_PATH,
+        params.YOLO_NETWORK_PATH,
+        params.YOLO_CONFIDENCE,
+        params.YOLO_THRESHOLD
     )
 
     result = q.enqueue(yolo.count_words_at_url, 'http://heroku.com')
@@ -35,11 +32,10 @@ def sample():
         boxes = boxes, 
         has_boxes = len(idxs) > 0,
         idxs = idxs.flatten() if len(idxs) > 0 else [],
-        image_name = image_name,       
+        image_name = params.SAMPLE_IMAGE_NAME,       
         labels = labels,
         result = result
     )
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(debug=True, host='0.0.0.0', port=port)
+    app.run(debug=True, host='0.0.0.0', port=params.port)

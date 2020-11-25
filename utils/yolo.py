@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+from config import params
 import numpy as np
 import argparse
 import time
@@ -11,12 +12,7 @@ def count_words_at_url(url):
     resp = requests.get(url)
     return len(resp.text.split())
 
-def runYOLOBoundingBoxes(image, yolopath, _confidence, _threshold):
-    # load all paths
-    labelsPath = os.path.sep.join([yolopath, "coco.names"])
-    weightsPath = os.path.sep.join([yolopath, "yolov3-tiny.weights"])
-    configPath = os.path.sep.join([yolopath, "yolov3-tiny.cfg"])
-
+def runYOLOBoundingBoxes(image, labelsPath, weightsPath, configPath, _confidence, _threshold):
     # fetch all labels
     LABELS = open(labelsPath).read().strip().split("\n")
     np.random.seed(0)
