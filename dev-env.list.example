@@ -1,0 +1,4 @@
+# copy in dev-env.list and fill
+DROPBOX_APP_KEY=
+DROPBOX_APP_SECRET=
+FLASK_SECRET_KEY=

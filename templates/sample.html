@@ -6,21 +6,24 @@
         position: absolute;
         border: 1px solid green;
     }
-
 </style>
 
 {{result}}
 {{labels}}
+
+<a href="{{login_url}}" target="_blank">
+    Auth Dropbox
+</a>
 <div class="frame">
     <img src="/static/{{image_name}}">
     {% if has_boxes %}
         {% for i in idxs %}
-            <div style=" 
-                left:{{ boxes[i][0] }}px;
-                top:{{ boxes[i][1] }}px;
-                width:{{ boxes[i][2] }}px;
-                height:{{ boxes[i][3] }}px;
-            "></div>
+        <div style=" 
+            left:{{ boxes[i][0] }}px;
+            top:{{ boxes[i][1] }}px;
+            width:{{ boxes[i][2] }}px;
+            height:{{ boxes[i][3] }}px;
+        "></div>
         {% endfor %}
     {% endif %}
 </div>

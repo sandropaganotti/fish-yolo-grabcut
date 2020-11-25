@@ -8,5 +8,10 @@ services:
       - "5000:5000"
     volumes:
       - .:/web
+    # copy and fill from dev-env.list.example
+    env_file:
+     - ./dev-env.list
   redis:
     image: "redis:alpine"
+    ports:
+      - "6379:6379"
