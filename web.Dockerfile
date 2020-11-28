@@ -20,14 +20,14 @@ WORKDIR /web
 # copy requirements.txt
 COPY requirements.txt ./requirements.txt
 
-# upgrade setuptools 
-RUN pip3 install --upgrade setuptools
-
 # upgrade pip
 RUN pip3 install --upgrade pip
 
 # install dependencies
 RUN pip3 install -r requirements.txt
+
+# upgrade setuptools 
+RUN pip3 install --upgrade setuptools
 
 # download weights 
 RUN wget https://pjreddie.com/media/files/yolov3.weights -P ./config
