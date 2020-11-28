@@ -29,6 +29,9 @@ RUN python3.7 -m pip install -r requirements.txt
 # upgrade setuptools 
 RUN python3.7 -m pip install --upgrade setuptools
 
+# fix heroku permission issues 
+RUN chmod 777 /usr/lib/python3/dist-packages/.wh.six-1.11.0.egg-info
+
 # download weights 
 RUN wget https://pjreddie.com/media/files/yolov3.weights -P ./config
 
