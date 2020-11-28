@@ -3,4 +3,3 @@ Flask
 numpy
 opencv-python
 rq
-rq-dashboard
