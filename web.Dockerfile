@@ -21,13 +21,13 @@ WORKDIR /web
 COPY requirements.txt ./requirements.txt
 
 # upgrade pip
-RUN pip3 install --upgrade pip
+RUN python3.7 -m pip install --upgrade pip
 
 # install dependencies
-RUN pip3 install -r requirements.txt
+RUN python3.7 -m pip install -r requirements.txt
 
 # upgrade setuptools 
-RUN pip3 install --upgrade setuptools
+RUN python3.7 -m pip install --upgrade setuptools
 
 # download weights 
 RUN wget https://pjreddie.com/media/files/yolov3.weights -P ./config
@@ -36,4 +36,4 @@ RUN wget https://pjreddie.com/media/files/yolov3.weights -P ./config
 COPY . .
 
 # launch the web app
-CMD python3 init.py 
+CMD python3.7 init.py 
