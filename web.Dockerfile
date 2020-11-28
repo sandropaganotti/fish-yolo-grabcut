@@ -27,7 +27,7 @@ RUN pip3 install --upgrade setuptools
 RUN pip3 install --upgrade pip
 
 # install dependencies
-RUN pip3 install -r requirements.txt --ignore-installed
+RUN pip3 install -r requirements.txt
 
 # download weights 
 RUN wget https://pjreddie.com/media/files/yolov3.weights -P ./config
