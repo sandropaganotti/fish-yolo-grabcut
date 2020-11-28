@@ -20,6 +20,9 @@ WORKDIR /web
 # copy requirements.txt
 COPY requirements.txt ./requirements.txt
 
+# upgrade setuptools 
+RUN pip3 install --upgrade setuptools
+
 # upgrade pip
 RUN pip3 install --upgrade pip
 
