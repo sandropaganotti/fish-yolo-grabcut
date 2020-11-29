@@ -30,7 +30,7 @@ RUN python3.7 -m pip install -r requirements.txt
 RUN python3.7 -m pip install --upgrade setuptools
 
 # download weights 
-# RUN wget https://pjreddie.com/media/files/yolov3.weights -P ./config
+RUN wget https://pjreddie.com/media/files/yolov3.weights -P ./config
 
 # copy all files over
 COPY . .
