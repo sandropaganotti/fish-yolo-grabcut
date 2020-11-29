@@ -7,9 +7,9 @@ ENV LANG=C.UTF-8
 # install Python and Pip
 RUN apt-get update && \
     apt-get install -y \
-    python3.7 python3-pip \
+    python3 python3-pip \
     libsm6 libxext6 libxrender-dev \
-    ffmpeg wget
+    ffmpeg wget python3-venv
 
 # expose port 5000 for streamlit
 EXPOSE 5000
@@ -17,14 +17,17 @@ EXPOSE 5000
 # make app directory
 WORKDIR /web
 
+# create venv
+RUN python3 -m venv /opt/venv
+
 # copy requirements.txt
 COPY requirements.txt ./requirements.txt
 
 # upgrade pip
-RUN python3.7 -m pip install --upgrade pip
+RUN /opt/venv/bin/python3 -m pip install --upgrade pip
 
 # install dependencies
-RUN python3.7 -m pip install -r requirements.txt
+RUN /opt/venv/bin/python3 -m pip install -r requirements.txt
 
 # download weights 
 RUN wget https://pjreddie.com/media/files/yolov3.weights -P ./config
@@ -33,4 +36,4 @@ RUN wget https://pjreddie.com/media/files/yolov3.weights -P ./config
 COPY . .
 
 # launch the web app
-CMD python3.7 init.py 
+CMD /opt/venv/bin/python3 init.py 
