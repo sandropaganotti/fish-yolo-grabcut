@@ -2,8 +2,8 @@ build:
   docker:
     web: web.Dockerfile
 run:
-  web: python3 init.py
+  web: /opt/venv/bin/python3 init.py
   worker:
     command:
-      - python3 worker.py
+      - /opt/venv/bin/python3 worker.py
     image: web
