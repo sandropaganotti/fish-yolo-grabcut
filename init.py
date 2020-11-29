@@ -4,14 +4,14 @@ from flask import (
 from utils import yolo, dropbox, queue
 import cv2 as cv
 import os
-#import rq_dashboard
+import rq_dashboard
 import redis
 
 app = Flask(__name__)
 
-#app.config.from_object(rq_dashboard.default_settings)
-#app.config["RQ_DASHBOARD_REDIS_URL"] = params.REDIS_URL
-#app.register_blueprint(rq_dashboard.blueprint, url_prefix="/rq")
+app.config.from_object(rq_dashboard.default_settings)
+app.config["RQ_DASHBOARD_REDIS_URL"] = params.REDIS_URL
+app.register_blueprint(rq_dashboard.blueprint, url_prefix="/rq")
 app.secret_key = params.FLASK_SECRET_KEY
 
 redis_client = redis.from_url(params.REDIS_URL, decode_responses=True)
