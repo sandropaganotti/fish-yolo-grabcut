@@ -26,9 +26,6 @@ RUN python3.7 -m pip install --upgrade pip
 # install dependencies
 RUN python3.7 -m pip install -r requirements.txt
 
-# upgrade setuptools 
-RUN python3.7 -m pip install --upgrade setuptools
-
 # download weights 
 RUN wget https://pjreddie.com/media/files/yolov3.weights -P ./config
 
