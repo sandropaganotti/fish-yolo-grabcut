@@ -99,6 +99,9 @@ def process_new_images(accountID, entries):
             params.YOLO_THRESHOLD
         )
 
+        if (idxs is None or len(idxs) == 0):
+            continue
+
         for idx in idxs[0]:
             if (labels[idx] in params.YOLO_BLACKLISTED_NAMES):
                 continue
