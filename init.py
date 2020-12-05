@@ -6,6 +6,7 @@ import cv2 as cv
 import os
 import rq_dashboard
 import redis
+import sys
 
 app = Flask(__name__)
 
@@ -18,6 +19,7 @@ redis_client = redis.from_url(params.REDIS_URL, decode_responses=True)
 
 @app.route('/')
 def index():
+    print(session.get('account_id'), file = sys.stderr)
     queue.index_files(session.get('account_id'))
 
     return render_template('index.html', 
@@ -38,8 +40,10 @@ def oauth_callback():
     auth_result = dropbox.get_flow().finish(request.args)
     account = auth_result.account_id
     access_token = auth_result.access_token
+    refresh_token = auth_result.refresh_token
     session['account_id'] = account
     redis_client.hset('tokens', account, access_token)
+    redis_client.hset('refresh_tokens', account, refresh_token)
     return redirect(url_for('index'))
 
 # dropbox external login

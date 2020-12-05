@@ -20,6 +20,7 @@ def get_flow():
         get_url('oauth_callback'),
         session,
         'dropbox-csrf-token',
-        consumer_secret=params.DROPBOX_APP_SECRET)
+        consumer_secret = params.DROPBOX_APP_SECRET,
+        token_access_type = 'offline')
 
 

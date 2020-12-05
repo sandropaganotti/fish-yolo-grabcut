@@ -6,28 +6,37 @@ from dropbox.files import DeletedMetadata, FolderMetadata, WriteMode
 from worker import conn
 from config import params
 from utils import yolo
+from PIL import Image
+from datetime import datetime
 import redis
 import sys
 import numpy as np
 import cv2 as cv
 import os
+import io
 
 redis_client = redis.from_url(params.REDIS_URL, decode_responses=True)
 q = Queue(connection=conn)
 
 def get_token_cursor(accountID):
     if accountID is None:
-        return None, None
+        return None, None, None
     token = redis_client.hget('tokens', accountID)
     cursor = redis_client.hget('cursors', accountID)
-    return token, cursor
+    refresh_token = redis_client.hget('refresh_tokens', accountID)
+    return token, cursor, refresh_token
 
 def index_files(accountID):
-    token, cursor = get_token_cursor(accountID)
+    token, cursor, refresh_token = get_token_cursor(accountID)
     if token is None:
         return
     
-    dbx = Dropbox(token)
+    dbx = Dropbox(token, 
+        oauth2_refresh_token = refresh_token, 
+        app_key = params.DROPBOX_APP_KEY, 
+        app_secret = params.DROPBOX_APP_SECRET,    
+    )
+
     has_more = True
     entries = []
 
@@ -59,15 +68,26 @@ def index_files(accountID):
 
 # called by the worker through rq
 def process_new_images(accountID, entries):
-    token, cursor = get_token_cursor(accountID)
+    token, cursor, refresh_token = get_token_cursor(accountID)
     if token is None:
         return
 
-    dbx = Dropbox(token)
+    dbx = Dropbox(token, 
+        oauth2_refresh_token = refresh_token, 
+        app_key = params.DROPBOX_APP_KEY, 
+        app_secret = params.DROPBOX_APP_SECRET,    
+    )
 
     for entry in entries:
         _, resp = dbx.files_download(entry)
-        image = np.asarray(bytearray(resp.content), dtype = 'uint8')
+        image_bytes = bytearray(resp.content)
+
+        # 36867 is the exif property for date time
+        creation_time = Image.open(io.BytesIO(image_bytes)).getexif().get(36867)
+        if creation_time is None:
+            creation_time = datetime.now().strftime('%Y:%m:%d %H:%M:%S')
+
+        image = np.asarray(image_bytes, dtype = 'uint8')
         image = cv.imdecode(image, cv.IMREAD_COLOR)
 
         boxes, idxs, labels = yolo.runYOLOBoundingBoxes(
@@ -82,18 +102,44 @@ def process_new_images(accountID, entries):
         for idx in idxs[0]:
             if (labels[idx] in params.YOLO_BLACKLISTED_NAMES):
                 continue
-            x = boxes[idx][0] if boxes[idx][0] > 0 else 0 
-            y = boxes[idx][1] if boxes[idx][1] > 0 else 0
-            w = boxes[idx][2] - (0 if boxes[idx][0] > 0 else abs(boxes[idx][0]))
-            h = boxes[idx][3] - (0 if boxes[idx][1] > 0 else abs(boxes[idx][1]))
-            print([x,y,w,h, boxes[idx], entry, labels[idx], os.path.sep.join([params.DROPBOX_OUTPUT_PATH, entry[:-3] + '_' + str(idx) + '.jpg'])], file = sys.stderr)
-            cropped_image = image[y:y+h, x:x+w]
-            is_success, buffer = cv.imencode('.jpg', cropped_image)
-            dbx.files_upload(
-                buffer.tobytes(),
-                os.path.sep.join([
-                    params.DROPBOX_OUTPUT_PATH, 
-                    os.path.basename(entry)[:-3] + '_' + str(idx) + '.jpg',
-                ]),
-                mode = WriteMode('overwrite')
+            crop_upload_store(
+                accountID, 
+                dbx, 
+                idx,
+                entry,
+                creation_time,
+                image,
+                boxes[idx], 
+                labels[idx]
             )
+
+
+def crop_upload_store(accountID, dbx, idx, entry, creation_time, image, box, label):
+    x = box[0] if box[0] > 0 else 0 
+    y = box[1] if box[1] > 0 else 0
+    w = box[2] - (0 if box[0] > 0 else abs(box[0]))
+    h = box[3] - (0 if box[1] > 0 else abs(box[1]))
+    cropped_image = image[y:y+h, x:x+w]
+    is_success, buffer = cv.imencode('.jpg', cropped_image)
+    output_file = os.path.basename(entry)[:-3] + '_' + str(idx) + '.jpg'
+    output_path = os.path.sep.join([
+        params.DROPBOX_OUTPUT_PATH, 
+        output_file,
+    ])
+    dbx.files_upload(
+        buffer.tobytes(),
+        output_path,               
+        mode = WriteMode('overwrite')
+    )
+    redis_client.hmset(
+        accountID + '_' + output_file, 
+        {
+            'x': x,
+            'y': y,
+            'creation_time': creation_time,
+            'file_path': output_path,
+            'label': label
+        }
+    )
+
+
