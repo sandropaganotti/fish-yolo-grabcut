@@ -1,12 +1,15 @@
 from config import params
 from flask import (
-    Flask, render_template, Response, request, url_for, redirect, session)
+    abort, Flask, render_template, Response, request, url_for, redirect, session)
 from utils import yolo, dropbox, queue
+from hashlib import sha256
 import cv2 as cv
 import os
 import rq_dashboard
 import redis
 import sys
+import hmac
+import json
 
 app = Flask(__name__)
 
@@ -26,7 +29,7 @@ def index():
         login_url=url_for('login'),
     )
 
-# dropbox webhook
+# dropbox webhook verification
 @app.route('/webhook', methods=['GET'])
 def verify():
     resp = Response(request.args.get('challenge'))
@@ -51,30 +54,20 @@ def oauth_callback():
 def login():
     return redirect(dropbox.get_flow().start()) 
 
-# sample route
-@app.route('/sample')
-def sample():
-    image = cv.imread(params.SAMPLE_IMAGE_PATH)
-    boxes, idxs, labels = yolo.runYOLOBoundingBoxes(
-        image, 
-        params.COCO_NAMES_PATH,
-        params.YOLO_WEIGHTS_PATH,
-        params.YOLO_NETWORK_PATH,
-        params.YOLO_CONFIDENCE,
-        params.YOLO_THRESHOLD
-    )
-
-    #result = q.enqueue(yolo.count_words_at_url, 'http://heroku.com')
-
-    return render_template('sample.html', 
-        boxes = boxes, 
-        has_boxes = len(idxs) > 0,
-        idxs = idxs.flatten() if len(idxs) > 0 else [],
-        image_name = params.SAMPLE_IMAGE_NAME,       
-        labels = labels,
-        login_url=url_for('login'),
-    )
-
+# actual dropbox webhook
+@app.route('/webhook', methods=['POST'])
+def webhook():
+    signature = request.headers.get('X-Dropbox-Signature')
+    key = bytes(params.DROPBOX_APP_SECRET, encoding="ascii")
+    computed_signature = hmac.new(key, request.data, sha256).hexdigest()
+    print('one', file = sys.stderr)
+    if not hmac.compare_digest(signature, computed_signature):
+        abort(403)
+    print('two', file = sys.stderr)
+    for account in json.loads(request.data)['list_folder']['accounts']:
+        print(account, file = sys.stderr)
+        queue.index_files(session.get('account_id'))
+    return ''
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=params.FLASK_PORT)

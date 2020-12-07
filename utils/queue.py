@@ -115,6 +115,8 @@ def process_new_images(accountID, entries):
                 boxes[idx], 
                 labels[idx]
             )
+        
+        dbx.files_delete(entry)
 
 
 def crop_upload_store(accountID, dbx, idx, entry, creation_time, image, box, label):
